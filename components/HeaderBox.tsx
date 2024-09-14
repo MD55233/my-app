@@ -6,7 +6,7 @@ const HeaderBox = ({ type = "title", title, subtext, user }: HeaderBoxProps) => 
 
       <div className="header-box">
             <div className="header-box-container">
-      <Link href="/" className="mb-12 cursor-pointer flex items-center gap-2">
+       <Link href="/" className="mb-12 cursor-pointer flex items-center gap-2">
         <div className="w-32 h-32 max-xl:w-24 max-xl:h-24 p-0 m-0 inline-block header-logo">
           <Image
             src="/icons/fairyglowlogo.svg"
