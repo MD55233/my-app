@@ -19,7 +19,7 @@ const Sidebar = ({user}:
       </div>
       <div className="profile-details">
         <h1 className='profile-name'>
-          {user.firstName} {user.lastName}
+          {user.name}
         </h1>
         <p  className="profile-email"> {user.email} </p>
 

@@ -1,21 +1,25 @@
 import React from 'react';
 import { FormControl, FormLabel, FormField, FormMessage } from './ui/form';
 import { Input } from './ui/input';
-import { Control } from 'react-hook-form';
+import { Control, Path } from 'react-hook-form'; // Path is useful for typed form fields
 import { z } from 'zod';
 import { authFormSchema } from '@/lib/utils';
 
+// Define form schema and infer types
+const formSchema = authFormSchema('sign-up');
+type FormSchemaType = z.infer<typeof formSchema>;
+
 interface CustmonInputProps {
-  control: Control<z.infer<typeof authFormSchema>>;
-  name:  Control<z.infer<typeof authFormSchema>> ,
-  label: string,
-  placeholder: string
+  control: Control<FormSchemaType>;
+  name: Path<FormSchemaType>; // Path enforces that 'name' is one of the form schema keys
+  label: string;
+  placeholder: string;
 }
 
 const CustmonInput = ({ control, name, label, placeholder }: CustmonInputProps) => {
   return (
     <FormField
-      control={control} // Use control prop instead of form.control
+      control={control}
       name={name}
       render={({ field }) => (
         <div className="form-item">
@@ -38,3 +42,4 @@ const CustmonInput = ({ control, name, label, placeholder }: CustmonInputProps) 
 };
 
 export default CustmonInput;
+ 

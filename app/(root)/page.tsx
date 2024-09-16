@@ -1,10 +1,10 @@
 import HeaderBox from '@/components/HeaderBox'; // Adjust the path as needed
 import TotalBalanceBox from '@/components/TotalBalanceBox';
+import { getLoggedInUser } from '@/lib/actions/user.actions';
 import Image from 'next/image';
 
-const Home = () => {
-  const loggedIn = { firstName: 'Daniyal' , lastName: 'Dawood' , email:'sample@gmail.com'}; // Example user data
-
+const Home = async () => {
+  const loggedIn = await getLoggedInUser();
   return (
     <section className="home">
       <div className="home-content">
@@ -12,7 +12,7 @@ const Home = () => {
           <HeaderBox
             type="greeting" // Ensure HeaderBox expects this prop
             title="Welcome"
-            user={loggedIn?.firstName || 'Guest'}
+            user={loggedIn?.name || 'Guest'}
             subtext="Access and manage your account and transactions"
           />
             

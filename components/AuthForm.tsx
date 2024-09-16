@@ -1,48 +1,67 @@
-'use client'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useState } from 'react'
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
-// shadcn form import
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Button } from '@/components/ui/button';
+import CustmonInput from './CustmonInput';
+import { authFormSchema } from '@/lib/utils'; // Make sure this function returns the correct schema
 
-import { Button } from "@/components/ui/button"
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import CustmonInput from './CustmonInput'
-import { authFormSchema } from '@/lib/utils'
+  Form
+} from '@/components/ui/form';
+import { useRouter } from 'next/navigation';
+import { getLoggedInUser, signUp, signIn } from '@/lib/actions/user.actions'; // Make sure these functions are correctly implemented and imported
 
-const formSchema = z.object({
-  username: z.string().min(1).max(50),
-})
-
+// Determine the form schema based on the type
 const AuthForm = ({ type }: { type: string }) => {
-  const [user, setUser] = useState(null)
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof authFormSchema>>({
-    resolver: zodResolver(authFormSchema),
+  // Use the authFormSchema function to get the schema based on the type
+  const schema = authFormSchema(type);
+
+  // 1. Define your form
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema), 
     defaultValues: {
-      username: "",
-      password: ''
+      email: '',
+      password: '',
     },
-  })
+  });
 
-  function onSubmit(values: z.infer<typeof authFormSchema>) {
-    console.log(values)
-  }
+  // 2. Define your submit handler
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    console.log('Submitted Data:', data); 
+
+  
+    try {
+      if(type === 'sign-up') {
+        const newUser = await signUp(data); // Fixed function call
+        setUser(newUser);
+      }
+ 
+        if(type === 'sign-in') {
+           const response = await signIn({
+           email: data.email,
+           password: data.password,
+          });
+       if (response) router.push('/'); // Assuming you want to redirect after successful sign-in
+      }
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <section className="auth-form mx-4 md:mx-auto md:max-w-md"> {/* Add margins */}
+    <section className="auth-form mx-4 md:mx-auto md:max-w-md">
       <header className="flex flex-col gap-5 md:gap-8">
         <Link href="/" className="mb-12 cursor-pointer flex items-center gap-2">
           <div className="w-32 h-32 max-xl:w-24 max-xl:h-24 p-0 m-0 inline-block">
@@ -70,35 +89,89 @@ const AuthForm = ({ type }: { type: string }) => {
           </p>
         </div>
       </header>
+
       {user ? (
         <div className="flex flex-col gap-4">
-          {/* Plaid Link */}
+          {/* Plaid Link or other additional content when the user is logged in */}
         </div>
       ) : (
         <>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <CustmonInput
+              {type === 'sign-up' && (
+                <>
+                  <div className="flex gap-4">
+                    <CustmonInput 
+                      control={form.control}
+                      name="firstName"
+                      label="First Name"
+                      placeholder="Enter your first name"
+                    />
+                    <CustmonInput 
+                      control={form.control}
+                      name="lastName" 
+                      label="Last Name"
+                      placeholder="Enter your last name"
+                    />
+
+                  </div>
+                <CustmonInput
                 control={form.control}
                 name="username"
                 label="Username"
                 placeholder="Enter your username"
               />
+                  <CustmonInput
+                    control={form.control}
+                    name="referralUsername"
+                    label="Referral Username"
+                    placeholder="Enter your referral username"
+                  />
+                </>
+              )}
+
+              <CustmonInput
+                control={form.control}
+                name="email"
+                label="Email"
+                placeholder="Enter your email"
+              />
+
               <CustmonInput
                 control={form.control}
                 name="password"
                 label="Password"
                 placeholder="Enter your password"
               />
-              <Button type="submit" className="form-btn">
-                Submit
-              </Button>
+
+              <div className="flex flex-col gap-4">
+                <Button type="submit" disabled={isLoading} className="form-btn">
+                  {isLoading ? (
+                    <>
+                      {/* Replace with a proper loading spinner if needed */}
+                      <span className="animate-spin">🔄</span> &nbsp;
+                      Loading...
+                    </>
+                  ) : type === 'sign-in'
+                    ? 'Sign In'
+                    : 'Sign Up'}
+                </Button>
+              </div>
             </form>
           </Form>
+
+          <footer className="flex justify-center gap-1">
+            <p className="text-14 font-normal text-gray-600">
+              {type === 'sign-in' ? "Don't have an account?" : "Already have an account?"}
+            </p>
+            <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
+              {type === 'sign-in' ? 'Sign up' : 'Sign In'}
+            </Link>
+          </footer>
         </>
       )}
     </section>
-  )
-}
+  );
+};
 
-export default AuthForm
+export default AuthForm;
