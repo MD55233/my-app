@@ -5,9 +5,11 @@ import { Control } from 'react-hook-form';
 import { z } from 'zod';
 import { authFormSchema } from '@/lib/utils';
 
+const formSchema = authFormSchema('sign-up')
+
 interface CustmonInputProps {
-  control: Control<z.infer<typeof authFormSchema>>;
-  name:  Control<z.infer<typeof authFormSchema>> ,
+  control: Control<z.infer<typeof formSchema>>;
+  name:  Control<z.infer<typeof formSchema>> ,
   label: string,
   placeholder: string
 }

@@ -7,19 +7,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-const Sidebar = ({user}:
-     SidebarProps) => {
-        const pathname = usePathname();
+const Sidebar = ({ user }: SiderbarProps) => {
+  const pathname = usePathname();
+
   return (
    <section className="sidebar">
      <div className="profile-banner flex flex-col pb-8"/>
      <div className="profile">
       <div className="profile-img">
-        <span className="text-5xl font-bold text-blue-500"> {user.firstName[0]} </span>
+        <span className="text-5xl font-bold text-blue-500"> {user.name} </span>
       </div>
       <div className="profile-details">
         <h1 className='profile-name'>
-          {user.firstName} {user.lastName}
+        {user.name}
         </h1>
         <p  className="profile-email"> {user.email} </p>
 

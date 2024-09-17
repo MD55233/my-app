@@ -196,7 +196,24 @@ export const getTransactionStatus = (date: Date) => {
 };
 
 
-export const authFormSchema = z.object({
-  username: z.string().min().max(50),
-  password: z.string() .min(8) 
-})
+export const authFormSchema = (type: string) => {
+  if (type === 'sign-up') {
+    return z.object({
+      firstName: z.string().min(1, 'First name is required'),
+      lastName: z.string().min(1, 'Last name is required'),
+      address1: z.string().min(1, 'Address is required'),
+      city: z.string().min(1, 'City is required'),
+      state: z.string().min(1, 'State is required'),
+      postalCode: z.string().min(1, 'Postal code is required'),
+      dateOfBirth: z.string().min(1, 'Date of birth is required'),
+      ssn: z.string().min(1, 'SSN is required'),
+      email: z.string().email('Invalid email address'),
+      password: z.string().min(6, 'Password must be at least 6 characters long'),
+    });
+  } else {
+    return z.object({
+      email: z.string().email('Invalid email address'),
+      password: z.string().min(6, 'Password must be at least 6 characters long'),
+    });
+  }
+};
