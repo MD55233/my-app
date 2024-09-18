@@ -6,22 +6,23 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import Footer from './Footer'
 
 const Sidebar = ({ user }: SiderbarProps) => {
   const pathname = usePathname();
 
   return (
-   <section className="sidebar">
+   <section className="sidebar ">
      <div className="profile-banner flex flex-col pb-8"/>
      <div className="profile">
       <div className="profile-img">
-        <span className="text-5xl font-bold text-blue-500"> {user.name} </span>
+        <span className="text-5xl font-bold text-blue-500">  </span>
       </div>
       <div className="profile-details">
         <h1 className='profile-name'>
-        {user.name}
+       
         </h1>
-        <p  className="profile-email"> {user.email} </p>
+        <p  className="profile-email">  </p>
 
       </div>
      </div>
@@ -36,7 +37,7 @@ const Sidebar = ({ user }: SiderbarProps) => {
               key={item.label}
               className={cn('sidebar-link', { 'bg-bank-gradient': isActive })} // Correct class name and conditional
             >
-              <div 
+             <div 
               className="relative size-6">
                 <Image
                   src={item.imgURL}
@@ -59,7 +60,7 @@ const Sidebar = ({ user }: SiderbarProps) => {
         USER
      </nav>
      
-     FOOTER
+     <Footer user ={user} />
    </section>
   )
 }

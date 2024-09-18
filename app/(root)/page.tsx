@@ -2,7 +2,7 @@ import HeaderBox from '@/components/HeaderBox'; // Adjust the path as needed
 import TotalBalanceBox from '@/components/TotalBalanceBox';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import Image from 'next/image';
-
+ 
 const Home = async () => {
   const loggedIn = await getLoggedInUser();
 
