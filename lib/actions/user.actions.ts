@@ -1,21 +1,51 @@
 'use server';
 
-import { ID } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { createAdminClient, createSessionClient } from "../appwrite";
 import { cookies } from "next/headers";
-import { parseStringify } from "../utils";
-import { SignUpParams, signInProps } from "../types"; // Adjust the import based on where these types are defined
+import { encryptId, extractCustomerIdFromUrl, parseStringify } from "../utils";
+import { CountryCode, ProcessorTokenCreateRequest, ProcessorTokenCreateRequestProcessorEnum, Products } from "plaid";
 
-export const signIn = async ({ email, password }: signInProps) => {
+import { plaidClient } from '@/lib/plaid';
+import { revalidatePath } from "next/cache";
+import { addFundingSource, createDwollaCustomer } from "./dwolla.actions";
+
+
+export const getUserInfo = async ({ userId }: getUserInfoProps) => {
     try {
-        const { account } = await createAdminClient();
-        const response = await account.createEmailPasswordSession(email, password);
-        return parseStringify(response);
+      const { database } = await createAdminClient();
+  
+      const user = await database.listDocuments(
+        DATABASE_ID!,
+        USER_COLLECTION_ID!,
+        [Query.equal('userId', [userId])]
+      )
+  
+      return parseStringify(user.documents[0]);
     } catch (error) {
-        console.error('Error during sign-in:', error);
-        throw new Error('Failed to sign in');
+      console.log(error)
     }
-};
+  }
+
+  export const signIn = async ({ email, password }: signInProps) => {
+    try {
+      const { account } = await createAdminClient();
+      const session = await account.createEmailPasswordSession(email, password);
+  
+      cookies().set("appwrite-session", session.secret, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+      });
+  
+      const user = await getUserInfo({ userId: session.userId }) 
+  
+      return parseStringify(user);
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
 
 export const signUp = async (userData: SignUpParams) => {
     const { email, password, firstName, lastName } = userData;
@@ -54,3 +84,17 @@ export const getLoggedInUser = async () => {
         return null;
     }
 };
+
+
+
+export const logoutAccount = async () => {
+    try {
+      const { account } = await createSessionClient();
+  
+      cookies().delete('appwrite-session');
+  
+      await account.deleteSession('current');
+    } catch (error) {
+      return null;
+    }
+  }
